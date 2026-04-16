@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0047)file:///Users/jv/Downloads/trainingsplan_5.html -->
+<!-- saved from url=(0047)file:///Users/jv/Downloads/trainingsplan_6.html -->
 <html lang="de"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -83,8 +83,6 @@
   .timer-label{font-size:10px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
   .timer-row{display:flex;align-items:center;gap:10px}
   .timer-display{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--accent);min-width:72px;flex-shrink:0;letter-spacing:.02em}
-  .timer-display.running{animation:pulse 1s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
   .timer-right{flex:1;min-width:0}
   .timer-controls{display:flex;gap:6px;margin-bottom:5px}
   .timer-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--mono);font-size:12px;cursor:pointer;white-space:nowrap}
@@ -263,7 +261,7 @@
 <div class="timer-bar">
   <div class="timer-label">Pausentimer</div>
   <div class="timer-row">
-    <div class="timer-display" id="timer-display">01:00</div>
+    <div class="timer-display" id="timer-display">00:54</div>
     <div class="timer-right">
       <div class="timer-controls">
         <button class="timer-btn primary" id="timer-start" onclick="timerToggle()">Start</button>
@@ -345,11 +343,11 @@ function resetDay(d){
   document.getElementById('prog-text-'+d).textContent='0 / '+view.querySelectorAll('.ex-card').length;
 }
 
-function timerSet(s){timerSeconds=s;timerMax=s;timerRunning=false;clearInterval(timerInterval);document.getElementById('timer-start').textContent='Start';document.getElementById('timer-display').classList.remove('running');renderTimer();}
-function timerReset(){timerSeconds=timerMax;timerRunning=false;clearInterval(timerInterval);document.getElementById('timer-start').textContent='Start';document.getElementById('timer-display').classList.remove('running');renderTimer();}
+function timerSet(s){timerSeconds=s;timerMax=s;timerRunning=false;clearInterval(timerInterval);document.getElementById('timer-start').textContent='Start';renderTimer();}
+function timerReset(){timerSeconds=timerMax;timerRunning=false;clearInterval(timerInterval);document.getElementById('timer-start').textContent='Start';renderTimer();}
 function timerToggle(){
-  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-start').textContent='Start';document.getElementById('timer-display').classList.remove('running');}
-  else{if(timerSeconds===0)timerSeconds=timerMax;timerRunning=true;document.getElementById('timer-start').textContent='Pause';document.getElementById('timer-display').classList.add('running');timerInterval=setInterval(()=>{timerSeconds--;renderTimer();if(timerSeconds<=0){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-start').textContent='Start';document.getElementById('timer-display').classList.remove('running');if('vibrate'in navigator)navigator.vibrate([200,100,200]);}},1000);}
+  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-start').textContent='Start';}
+  else{if(timerSeconds===0)timerSeconds=timerMax;timerRunning=true;document.getElementById('timer-start').textContent='Pause';timerInterval=setInterval(()=>{timerSeconds--;renderTimer();if(timerSeconds<=0){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-start').textContent='Start';if('vibrate'in navigator)navigator.vibrate([200,100,200]);}},1000);}
 }
 function renderTimer(){const m=Math.floor(timerSeconds/60),s=timerSeconds%60;document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 </script>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<!-- saved from url=(0045)file:///Users/jv/Downloads/trainingsplan.html -->
+<html lang="de"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Trainingsplan</title>
+<link href="./Trainingsplan PHA_files/css2" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d0d0d;--surface:#161616;--surface2:#1f1f1f;
+    --border:#2a2a2a;--accent:#ff1fa9;--text:#f0f0f0;--muted:#666;
+    --mono:'DM Mono',monospace;--sans:'Syne',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding-bottom:150px}
+  .day-bar{display:flex;gap:8px;padding:20px 16px 12px;position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border)}
+  .day-btn{flex:1;padding:10px 6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:var(--sans);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all .2s;text-align:center}
+  .day-btn span{display:block;font-size:9px;font-weight:400;color:var(--muted);margin-top:2px;font-family:var(--mono)}
+  .day-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .day-btn.active span{color:rgba(255,255,255,.7)}
+  .day-header{padding:20px 16px 8px}
+  .day-title{font-size:22px;font-weight:800;line-height:1.1}
+  .day-goal{font-size:12px;color:var(--accent);font-family:var(--mono);margin-top:6px}
+  .progress-wrap{padding:12px 16px}
+  .progress-label{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:6px;display:flex;justify-content:space-between}
+  .progress-bar{height:3px;background:var(--border);border-radius:2px}
+  .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease}
+  .circuit{margin:0 16px 20px}
+  .circuit-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:var(--mono);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .circuit-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .round-tracker{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .round-dots{display:flex;gap:5px}
+  .round-dot{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--mono);color:var(--muted);transition:all .2s}
+  .round-dot.done{background:var(--accent);border-color:var(--accent);color:#fff}
+  .round-label{font-size:11px;color:var(--muted);font-family:var(--mono)}
+  .ex-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;position:relative;overflow:hidden;transition:border-color .2s}
+  .ex-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--border);transition:background .2s}
+  .ex-card.done::before{background:var(--accent)}
+  .ex-card.done{border-color:#222}
+  .ex-card.done .ex-name{color:var(--muted);text-decoration:line-through}
+  .ex-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer;margin-top:1px}
+  .ex-card.done .ex-check{background:var(--accent);border-color:var(--accent)}
+  .ex-check-icon{width:10px;height:10px;opacity:0;transition:opacity .2s}
+  .ex-card.done .ex-check-icon{opacity:1}
+  .ex-info{flex:1;min-width:0}
+  .ex-name{font-size:14px;font-weight:600;line-height:1.3;transition:color .2s;margin-bottom:6px}
+  .ex-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .weight-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:var(--mono);color:var(--accent);background:rgba(255,31,169,.08);border:1px solid rgba(255,31,169,.2);border-radius:6px;padding:3px 8px;cursor:pointer;transition:all .15s}
+  .weight-tag:active{background:rgba(255,31,169,.18)}
+  .ex-tag{font-size:10px;font-family:var(--mono);color:var(--muted);background:var(--surface2);border-radius:4px;padding:3px 6px}
+  .weight-input-wrap{display:none;align-items:center;gap:6px;margin-top:8px}
+  .weight-input-wrap.open{display:flex}
+  .weight-input{background:var(--surface2);border:1px solid var(--accent);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:13px;padding:7px 10px;width:130px;outline:none}
+  .weight-save{padding:7px 12px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:var(--mono);font-size:12px;cursor:pointer}
+  .note-box{margin:0 16px 16px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:12px;padding:12px 14px;font-size:12px;color:#a78bfa;font-family:var(--mono);line-height:1.6}
+  .warmup-block,.cooldown-block{margin:0 16px 20px;border-radius:14px;overflow:hidden;border:1px solid var(--border)}
+  .warmup-block{border-color:rgba(251,146,60,.25)}
+  .cooldown-block{border-color:rgba(99,179,237,.25)}
+  .block-header{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;user-select:none}
+  .warmup-block .block-header{background:rgba(251,146,60,.06)}
+  .cooldown-block .block-header{background:rgba(99,179,237,.06)}
+  .block-title{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-family:var(--mono)}
+  .warmup-block .block-title{color:rgba(251,146,60,.9)}
+  .cooldown-block .block-title{color:rgba(99,179,237,.9)}
+  .block-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-left:auto}
+  .block-arrow{font-size:10px;color:var(--muted);transition:transform .2s}
+  .block-body{display:none;padding:4px 8px 8px}
+  .block-body.open{display:block}
+  .wc-card{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid var(--border)}
+  .wc-card:last-child{border-bottom:none}
+  .wc-card.done .wc-name{color:var(--muted);text-decoration:line-through}
+  .wc-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer}
+  .wc-card.done .wc-check{background:var(--accent);border-color:var(--accent)}
+  .wc-check-icon{width:8px;height:8px;opacity:0;transition:opacity .2s}
+  .wc-card.done .wc-check-icon{opacity:1}
+  .wc-name{font-size:13px;font-weight:500;flex:1;transition:color .2s}
+  .wc-tag{font-size:10px;font-family:var(--mono);color:var(--muted);background:var(--surface2);border-radius:4px;padding:2px 6px;white-space:nowrap}
+  .reset-btn{display:block;margin:0 16px 32px;width:calc(100% - 32px);padding:14px;background:transparent;border:1px solid var(--border);border-radius:12px;color:var(--muted);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .2s}
+  .reset-btn:active{background:var(--surface)}
+  .day-view{display:none}
+  .day-view.active{display:block}
+  .timer-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);padding:10px 16px 16px;z-index:20}
+  .timer-label{font-size:10px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+  .timer-row{display:flex;align-items:center;gap:12px}
+  .timer-display{font-family:var(--mono);font-size:34px;font-weight:500;color:var(--accent);min-width:84px}
+  .timer-display.running{animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+  .timer-right{flex:1}
+  .timer-controls{display:flex;gap:6px;margin-bottom:6px}
+  .timer-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--mono);font-size:12px;cursor:pointer}
+  .timer-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .timer-presets{display:flex;gap:5px}
+  .preset-btn{flex:1;padding:6px 2px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--mono);font-size:11px;cursor:pointer;text-align:center}
+  .preset-btn:active{background:var(--border)}
+</style>
+</head>
+<body>
+
+<div class="day-bar">
+  <button class="day-btn active" onclick="switchDay(0)">Mo<span>Booty</span></button>
+  <button class="day-btn" onclick="switchDay(1)">Mi<span>Core</span></button>
+  <button class="day-btn" onclick="switchDay(2)">Sa<span>Heavy</span></button>
+</div>
+
+<!-- MONTAG -->
+<div class="day-view active" id="day-0">
+  <div class="day-header">
+    <div class="day-title">Montag — Booty &amp; Definition</div>
+    <div class="day-goal">Ziel: Straffung &amp; Po-Volumen</div>
+  </div>
+  <div class="warmup-block" style="margin-top:14px">
+    <div class="block-header" onclick="toggleBlock(this)">
+      <span class="block-title">Warm-up</span><span class="block-sub">5–8 min</span><span class="block-arrow" style="">▾</span>
+    </div>
+    <div class="block-body">
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Rudergerät oder Bike</div><span class="wc-tag">5 min locker</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Hüftkreise</div><span class="wc-tag">10 je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Glute Bridge bodyweight</div><span class="wc-tag">15 Wdh</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Leg Swings (vorwärts + seitlich)</div><span class="wc-tag">10 je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Bodyweight Squat</div><span class="wc-tag">12 Wdh</span></div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Fortschritt</span><span id="prog-text-0">0 / 10</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-0" style="width:0%"></div></div>
+  </div>
+  <div class="circuit">
+    <div class="circuit-label">Zirkel A — 3–5 Runden</div>
+    <div class="round-tracker"><div class="round-dots"><div class="round-dot" onclick="toggleRound(this)">1</div><div class="round-dot" onclick="toggleRound(this)">2</div><div class="round-dot" onclick="toggleRound(this)">3</div><div class="round-dot" onclick="toggleRound(this)">4</div><div class="round-dot" onclick="toggleRound(this)">5</div></div><div class="round-label">Runden</div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">KH Goblet Squats</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mo-a1-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mo-a1-w">12–16 kg</span></span><span class="ex-tag">15 Wdh</span></div><div class="weight-input-wrap" id="wrap-mo-a1-w"><input class="weight-input" type="text" placeholder="z.B. 14 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mo-a1-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mo-a1-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Liegestütze</div><div class="ex-meta"><span class="ex-tag">Körpergewicht</span><span class="ex-tag">12–15 Wdh</span><span class="ex-tag">auf Knien falls nötig</span></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">KH Ausfallschritte</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mo-a3-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mo-a3-w">2× 8–10 kg</span></span><span class="ex-tag">12 / Seite</span></div><div class="weight-input-wrap" id="wrap-mo-a3-w"><input class="weight-input" type="text" placeholder="z.B. 2× 10 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mo-a3-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mo-a3-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Face Pulls</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mo-a4-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mo-a4-w">10–15 kg</span></span><span class="ex-tag">20 Wdh</span><span class="ex-tag">Kabel</span></div><div class="weight-input-wrap" id="wrap-mo-a4-w"><input class="weight-input" type="text" placeholder="z.B. 12 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mo-a4-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mo-a4-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Leg Raises</div><div class="ex-meta"><span class="ex-tag">Körpergewicht</span><span class="ex-tag">15 Wdh</span></div></div></div>
+  </div>
+  <div class="circuit">
+    <div class="circuit-label">Zirkel B — 3–5 Runden</div>
+    <div class="round-tracker"><div class="round-dots"><div class="round-dot" onclick="toggleRound(this)">1</div><div class="round-dot" onclick="toggleRound(this)">2</div><div class="round-dot" onclick="toggleRound(this)">3</div><div class="round-dot" onclick="toggleRound(this)">4</div><div class="round-dot" onclick="toggleRound(this)">5</div></div><div class="round-label">Runden</div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">RDL KH</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mo-b1-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mo-b1-w">2× 12–14 kg</span></span><span class="ex-tag">15 Wdh</span></div><div class="weight-input-wrap" id="wrap-mo-b1-w"><input class="weight-input" type="text" placeholder="z.B. 2× 14 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mo-b1-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mo-b1-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Trizeps-Drücken</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mo-b2-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mo-b2-w">7,5–10 kg</span></span><span class="ex-tag">15 Wdh</span><span class="ex-tag">Kabel</span></div><div class="weight-input-wrap" id="wrap-mo-b2-w"><input class="weight-input" type="text" placeholder="z.B. 10 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mo-b2-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mo-b2-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Glute Kickbacks</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mo-b3-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mo-b3-w">5–7,5 kg</span></span><span class="ex-tag">15 / Seite</span><span class="ex-tag">Kabel</span></div><div class="weight-input-wrap" id="wrap-mo-b3-w"><input class="weight-input" type="text" placeholder="z.B. 7,5 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mo-b3-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mo-b3-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Seitheben KH</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mo-b4-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mo-b4-w">2× 2–4 kg</span></span><span class="ex-tag">15–20 Wdh</span><span class="ex-tag">leicht!</span></div><div class="weight-input-wrap" id="wrap-mo-b4-w"><input class="weight-input" type="text" placeholder="z.B. 2× 3 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mo-b4-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mo-b4-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Plank</div><div class="ex-meta"><span class="ex-tag">Körpergewicht</span><span class="ex-tag">60 Sek.</span></div></div></div>
+  </div>
+  <div class="cooldown-block">
+    <div class="block-header" onclick="toggleBlock(this)">
+      <span class="block-title">Cool-down</span><span class="block-sub">5–7 min</span><span class="block-arrow">▾</span>
+    </div>
+    <div class="block-body">
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Hüftbeuger-Dehnung (Ausfallschritt)</div><span class="wc-tag">45 sek je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Pigeon Pose (Po-Dehnung)</div><span class="wc-tag">45 sek je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Stehende Hamstring-Dehnung</div><span class="wc-tag">30 sek je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Schulter quer-Dehnung</div><span class="wc-tag">30 sek je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Kind-Position (Child's Pose)</div><span class="wc-tag">60 sek</span></div>
+    </div>
+  </div>
+  <button class="reset-btn" onclick="resetDay(0)">↺ Tag zurücksetzen</button>
+</div>
+
+<!-- MITTWOCH -->
+<div class="day-view" id="day-1">
+  <div class="day-header">
+    <div class="day-title">Mittwoch — Core-Sculpt &amp; Glute-Shape</div>
+    <div class="day-goal">Ziel: Schmale Taille &amp; Lift-Effekt</div>
+  </div>
+  <div class="warmup-block" style="margin-top:14px">
+    <div class="block-header" onclick="toggleBlock(this)">
+      <span class="block-title">Warm-up</span><span class="block-sub">5–8 min</span><span class="block-arrow">▾</span>
+    </div>
+    <div class="block-body">
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Stepmill oder Bike</div><span class="wc-tag">5 min locker</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Cat-Cow (Katzenbuckel)</div><span class="wc-tag">10 Wdh</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Dead Bug bodyweight</div><span class="wc-tag">8 je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Glute Bridge + Abduktion mit Band</div><span class="wc-tag">12 Wdh</span></div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Fortschritt</span><span id="prog-text-1">0 / 8</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-1" style="width:0%"></div></div>
+  </div>
+  <div class="circuit">
+    <div class="circuit-label">Zirkel A — 3–5 Runden</div>
+    <div class="round-tracker"><div class="round-dots"><div class="round-dot" onclick="toggleRound(this)">1</div><div class="round-dot" onclick="toggleRound(this)">2</div><div class="round-dot" onclick="toggleRound(this)">3</div><div class="round-dot" onclick="toggleRound(this)">4</div><div class="round-dot" onclick="toggleRound(this)">5</div></div><div class="round-label">Runden</div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Beinheben (Hängend / Stütz)</div><div class="ex-meta"><span class="ex-tag">Körpergewicht</span><span class="ex-tag">15 Wdh</span></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">KH Sumo Squats</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mi-a2-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mi-a2-w">16–20 kg</span></span><span class="ex-tag">20 Wdh</span></div><div class="weight-input-wrap" id="wrap-mi-a2-w"><input class="weight-input" type="text" placeholder="z.B. 18 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mi-a2-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mi-a2-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Bauch-Vakuum</div><div class="ex-meta"><span class="ex-tag">Vierfüßlerstand</span><span class="ex-tag">45 Sek.</span></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">KH Glute Bridge</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mi-a4-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mi-a4-w">16–22 kg</span></span><span class="ex-tag">20 Wdh</span></div><div class="weight-input-wrap" id="wrap-mi-a4-w"><input class="weight-input" type="text" placeholder="z.B. 20 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mi-a4-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mi-a4-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+  </div>
+  <div class="note-box">Bauch-Vakuum: komplett ausatmen, Bauchnabel extrem Richtung Wirbelsäule ziehen. Trainiert den Transversus — innerer „Gürtel" für schmale Taille.</div>
+  <div class="circuit">
+    <div class="circuit-label">Zirkel B — 3–5 Runden</div>
+    <div class="round-tracker"><div class="round-dots"><div class="round-dot" onclick="toggleRound(this)">1</div><div class="round-dot" onclick="toggleRound(this)">2</div><div class="round-dot" onclick="toggleRound(this)">3</div><div class="round-dot" onclick="toggleRound(this)">4</div><div class="round-dot" onclick="toggleRound(this)">5</div></div><div class="round-label">Runden</div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Crunches am Kabelzug</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mi-b1-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mi-b1-w">15–25 kg</span></span><span class="ex-tag">20 Wdh</span></div><div class="weight-input-wrap" id="wrap-mi-b1-w"><input class="weight-input" type="text" placeholder="z.B. 20 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mi-b1-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mi-b1-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Trizeps-Kickbacks</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mi-b2-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mi-b2-w">5 kg</span></span><span class="ex-tag">15 / Seite</span><span class="ex-tag">Kabel</span></div><div class="weight-input-wrap" id="wrap-mi-b2-w"><input class="weight-input" type="text" placeholder="z.B. 7,5 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mi-b2-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mi-b2-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Bicycle Crunches</div><div class="ex-meta"><span class="ex-tag">Körpergewicht</span><span class="ex-tag">20 ges. (langsam!)</span></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Pull-Throughs</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;mi-b4-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="mi-b4-w">15–20 kg</span></span><span class="ex-tag">20 Wdh</span><span class="ex-tag">Kabel</span></div><div class="weight-input-wrap" id="wrap-mi-b4-w"><input class="weight-input" type="text" placeholder="z.B. 17,5 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;mi-b4-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;mi-b4-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+  </div>
+  <div class="cooldown-block">
+    <div class="block-header" onclick="toggleBlock(this)">
+      <span class="block-title">Cool-down</span><span class="block-sub">5–7 min</span><span class="block-arrow">▾</span>
+    </div>
+    <div class="block-body">
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Supine Twist (liegend, Knie zur Seite)</div><span class="wc-tag">45 sek je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Pigeon Pose</div><span class="wc-tag">45 sek je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Adduktoren-Dehnung (Grätsche sitzend)</div><span class="wc-tag">45 sek</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Trizeps-Dehnung über Kopf</div><span class="wc-tag">30 sek je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Bauch-Vakuum (liegend, entspannt)</div><span class="wc-tag">3× 30 sek</span></div>
+    </div>
+  </div>
+  <button class="reset-btn" onclick="resetDay(1)">↺ Tag zurücksetzen</button>
+</div>
+
+<!-- SAMSTAG -->
+<div class="day-view" id="day-2">
+  <div class="day-header">
+    <div class="day-title">Samstag — Heavy Glute</div>
+    <div class="day-goal">Ziel: Maximaler Po-Aufbau, Kraft &amp; Stoffwechsel</div>
+  </div>
+  <div class="warmup-block" style="margin-top:14px">
+    <div class="block-header" onclick="toggleBlock(this)">
+      <span class="block-title">Warm-up</span><span class="block-sub">8–10 min</span><span class="block-arrow">▾</span>
+    </div>
+    <div class="block-body">
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Rudergerät</div><span class="wc-tag">5 min, Puls auf 120</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Glute Bridge bodyweight</div><span class="wc-tag">20 Wdh</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Hip Thrust mit leichtem Gewicht (Eingewöhnung)</div><span class="wc-tag">10 Wdh</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Hüftkreise + Leg Swings</div><span class="wc-tag">10 je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Schultern mobilisieren (Armkreisen)</div><span class="wc-tag">10 vor + 10 zurück</span></div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Fortschritt</span><span id="prog-text-2">0 / 6</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-2" style="width:0%"></div></div>
+  </div>
+  <div class="circuit">
+    <div class="circuit-label">Zirkel — 4–5 Runden</div>
+    <div class="round-tracker"><div class="round-dots"><div class="round-dot" onclick="toggleRound(this)">1</div><div class="round-dot" onclick="toggleRound(this)">2</div><div class="round-dot" onclick="toggleRound(this)">3</div><div class="round-dot" onclick="toggleRound(this)">4</div><div class="round-dot" onclick="toggleRound(this)">5</div></div><div class="round-label">Runden</div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">LH Hip Thrusts</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;sa-1-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="sa-1-w">30–40 kg</span></span><span class="ex-tag">12 Wdh</span><span class="ex-tag">inkl. Stange</span></div><div class="weight-input-wrap" id="wrap-sa-1-w"><input class="weight-input" type="text" placeholder="z.B. 35 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;sa-1-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;sa-1-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">LH Military Press</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;sa-2-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="sa-2-w">15–20 kg</span></span><span class="ex-tag">15 Wdh</span></div><div class="weight-input-wrap" id="wrap-sa-2-w"><input class="weight-input" type="text" placeholder="z.B. 17,5 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;sa-2-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;sa-2-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">LH Ausfallschritte statisch</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;sa-3-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="sa-3-w">20–25 kg</span></span><span class="ex-tag">10 / Seite</span></div><div class="weight-input-wrap" id="wrap-sa-3-w"><input class="weight-input" type="text" placeholder="z.B. 22,5 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;sa-3-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;sa-3-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">LH Rudern (enger Griff!)</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;sa-4-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="sa-4-w">20–25 kg</span></span><span class="ex-tag">15 Wdh</span></div><div class="weight-input-wrap" id="wrap-sa-4-w"><input class="weight-input" type="text" placeholder="z.B. 22,5 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;sa-4-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;sa-4-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">LH Deadlifts gestreckt</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;sa-5-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="sa-5-w">25–30 kg</span></span><span class="ex-tag">12 Wdh</span></div><div class="weight-input-wrap" id="wrap-sa-5-w"><input class="weight-input" type="text" placeholder="z.B. 27,5 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;sa-5-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;sa-5-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+    <div class="ex-card"><div class="ex-check" onclick="toggleEx(this.parentElement)"><svg class="ex-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="ex-info"><div class="ex-name">Russian Twists</div><div class="ex-meta"><span class="weight-tag" onclick="openWeight(this,&#39;sa-6-w&#39;)"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"></path></svg><span class="w-val" id="sa-6-w">5 kg Scheibe</span></span><span class="ex-tag">20 ges.</span></div><div class="weight-input-wrap" id="wrap-sa-6-w"><input class="weight-input" type="text" placeholder="z.B. 7,5 kg" onkeydown="if(event.key===&#39;Enter&#39;)saveWeight(&#39;sa-6-w&#39;,this)"><button class="weight-save" onclick="saveWeight(&#39;sa-6-w&#39;,this.previousElementSibling)">OK</button></div></div></div>
+  </div>
+  <div class="cooldown-block">
+    <div class="block-header" onclick="toggleBlock(this)">
+      <span class="block-title">Cool-down</span><span class="block-sub">7–10 min</span><span class="block-arrow">▾</span>
+    </div>
+    <div class="block-body">
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Pigeon Pose (intensiv, Heavy Day)</div><span class="wc-tag">60 sek je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Hüftbeuger-Dehnung (tiefer Ausfallschritt)</div><span class="wc-tag">60 sek je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Stehende Hamstring-Dehnung</div><span class="wc-tag">45 sek je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Oberer Rücken — Brustwirbelsäule rotieren</div><span class="wc-tag">30 sek je Seite</span></div>
+      <div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div><div class="wc-name">Kind-Position + tiefe Atmung</div><span class="wc-tag">90 sek</span></div>
+    </div>
+  </div>
+  <button class="reset-btn" onclick="resetDay(2)">↺ Tag zurücksetzen</button>
+</div>
+
+<!-- TIMER -->
+<div class="timer-bar">
+  <div class="timer-label">Pausentimer</div>
+  <div class="timer-row">
+    <div class="timer-display" id="timer-display">01:00</div>
+    <div class="timer-right">
+      <div class="timer-controls">
+        <button class="timer-btn primary" id="timer-start" onclick="timerToggle()">Start</button>
+        <button class="timer-btn" onclick="timerReset()">Reset</button>
+      </div>
+      <div class="timer-presets">
+        <button class="preset-btn" onclick="timerSet(45)">45s</button>
+        <button class="preset-btn" onclick="timerSet(60)">60s</button>
+        <button class="preset-btn" onclick="timerSet(90)">90s</button>
+        <button class="preset-btn" onclick="timerSet(120)">2min</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleBlock(header){
+  const body=header.nextElementSibling;
+  const arrow=header.querySelector('.block-arrow');
+  body.classList.toggle('open');
+  arrow.style.transform=body.classList.contains('open')?'rotate(180deg)':'';
+}
+function toggleWC(check){
+  const card=check.parentElement;
+  card.classList.toggle('done');
+}
+let currentDay=0,timerSeconds=60,timerMax=60,timerRunning=false,timerInterval=null;
+
+// Load saved weights on start
+document.querySelectorAll('.w-val[id]').forEach(el=>{
+  const saved=localStorage.getItem('w_'+el.id);
+  if(saved)el.textContent=saved;
+});
+
+function openWeight(tag,key){
+  const wrap=document.getElementById('wrap-'+key);
+  if(!wrap)return;
+  const isOpen=wrap.classList.contains('open');
+  document.querySelectorAll('.weight-input-wrap.open').forEach(w=>w.classList.remove('open'));
+  if(!isOpen){
+    wrap.classList.add('open');
+    setTimeout(()=>wrap.querySelector('.weight-input').focus(),80);
+  }
+}
+
+function saveWeight(key,inp){
+  const val=inp.value.trim();
+  if(!val){document.getElementById('wrap-'+key).classList.remove('open');return;}
+  localStorage.setItem('w_'+key,val);
+  document.getElementById(key).textContent=val;
+  inp.value='';
+  document.getElementById('wrap-'+key).classList.remove('open');
+}
+
+function switchDay(d){
+  document.querySelectorAll('.day-view').forEach((v,i)=>v.classList.toggle('active',i===d));
+  document.querySelectorAll('.day-btn').forEach((b,i)=>b.classList.toggle('active',i===d));
+  currentDay=d;
+  document.querySelectorAll('.weight-input-wrap.open').forEach(w=>w.classList.remove('open'));
+}
+
+function toggleEx(card){card.classList.toggle('done');updateProgress();}
+function toggleRound(dot){dot.classList.toggle('done');}
+
+function updateProgress(){
+  const view=document.getElementById('day-'+currentDay);
+  const total=view.querySelectorAll('.ex-card').length;
+  const done=view.querySelectorAll('.ex-card.done').length;
+  document.getElementById('prog-'+currentDay).style.width=(total?done/total*100:0)+'%';
+  document.getElementById('prog-text-'+currentDay).textContent=done+' / '+total;
+}
+
+function resetDay(d){
+  const view=document.getElementById('day-'+d);
+  view.querySelectorAll('.ex-card').forEach(c=>c.classList.remove('done'));
+  view.querySelectorAll('.round-dot').forEach(r=>r.classList.remove('done'));
+  view.querySelectorAll('.weight-input-wrap').forEach(w=>w.classList.remove('open'));
+  document.getElementById('prog-'+d).style.width='0%';
+  document.getElementById('prog-text-'+d).textContent='0 / '+view.querySelectorAll('.ex-card').length;
+}
+
+function timerSet(s){timerSeconds=s;timerMax=s;timerRunning=false;clearInterval(timerInterval);document.getElementById('timer-start').textContent='Start';document.getElementById('timer-display').classList.remove('running');renderTimer();}
+function timerReset(){timerSeconds=timerMax;timerRunning=false;clearInterval(timerInterval);document.getElementById('timer-start').textContent='Start';document.getElementById('timer-display').classList.remove('running');renderTimer();}
+function timerToggle(){
+  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-start').textContent='Start';document.getElementById('timer-display').classList.remove('running');}
+  else{if(timerSeconds===0)timerSeconds=timerMax;timerRunning=true;document.getElementById('timer-start').textContent='Pause';document.getElementById('timer-display').classList.add('running');timerInterval=setInterval(()=>{timerSeconds--;renderTimer();if(timerSeconds<=0){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-start').textContent='Start';document.getElementById('timer-display').classList.remove('running');if('vibrate'in navigator)navigator.vibrate([200,100,200]);}},1000);}
+}
+function renderTimer(){const m=Math.floor(timerSeconds/60),s=timerSeconds%60;document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+</script>
+
+
+</body></html>

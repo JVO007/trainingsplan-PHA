@@ -337,34 +337,189 @@ function buildPhaseBar(dayIdx) {
   </div>`;
 }
 
+// ── Warm-up / Cool-down variations per day per phase ──
+const warmups = {
+  0: [ // Montag
+    [ // Phase 0 (Wo 1-2)
+      ['Rudergerät oder Bike','5 min locker'],
+      ['Hip Circles + Leg Swings','10 je Seite'],
+      ['Glute Bridge (bodyweight)','15 Wdh'],
+      ['Bodyweight Squat','12 Wdh'],
+      ['Dead Bug','8 je Seite'],
+    ],
+    [ // Phase 1 (Wo 3-4)
+      ['Bike oder Stepmill','5 min locker'],
+      ['Cat-Cow','10 Wdh'],
+      ['Fire Hydrant (bodyweight)','12 je Seite'],
+      ['Reverse Lunge (bodyweight)','10 je Seite'],
+      ['Bird Dog','8 je Seite'],
+    ],
+    [ // Phase 2 (Wo 5-6)
+      ['Rudergerät','5 min, Puls auf 130'],
+      ['Leg Swings vorwärts + seitlich','10 je Seite'],
+      ['Glute Bridge mit Abduktion','15 Wdh'],
+      ['Jump Squat (leicht)','10 Wdh'],
+      ['Dead Bug','10 je Seite'],
+    ],
+  ],
+  1: [ // Mittwoch
+    [ // Phase 0
+      ['Stepmill oder Bike','5 min locker'],
+      ['Cat-Cow','10 Wdh'],
+      ['Dead Bug (bodyweight)','8 je Seite'],
+      ['KB Glute Bridge (light)','12 Wdh'],
+    ],
+    [ // Phase 1
+      ['Bike','5 min locker'],
+      ['Hip Circles','10 je Seite'],
+      ['Bird Dog','10 je Seite'],
+      ['Reverse Crunch (leicht)','10 Wdh'],
+    ],
+    [ // Phase 2
+      ['Rudergerät','5 min locker'],
+      ['Thoracic Rotation (liegend)','8 je Seite'],
+      ['Dead Bug','10 je Seite'],
+      ['Bodyweight Sumo Squat','15 Wdh'],
+    ],
+  ],
+  2: [ // Samstag
+    [ // Phase 0
+      ['Rudergerät','5 min, Puls auf 120'],
+      ['Glute Bridge (bodyweight)','20 Wdh'],
+      ['BB Hip Thrust (light, warm-up)','10 Wdh'],
+      ['Hip Circles + Leg Swings','10 je Seite'],
+      ['Shoulder Circles','10 vor + 10 zurück'],
+    ],
+    [ // Phase 1
+      ['Bike','5 min locker'],
+      ['Fire Hydrant','12 je Seite'],
+      ['BB Hip Thrust (leicht, 2 Sätze)','10 Wdh'],
+      ['Cat-Cow','10 Wdh'],
+      ['Arm Circles + Shoulder Rolls','10 je Richtung'],
+    ],
+    [ // Phase 2
+      ['Rudergerät','5 min, Puls auf 130'],
+      ['Glute Bridge + Abduktion','15 Wdh'],
+      ['BB Hip Thrust Eingewöhnung (schwerer)','8 Wdh'],
+      ['Leg Swings','10 je Seite'],
+      ['Dead Bug','8 je Seite'],
+    ],
+  ],
+};
+
+const cooldowns = {
+  0: [ // Montag
+    [ // Phase 0
+      ['Hip Flexor Stretch (deep lunge)','45 sek je Seite'],
+      ['Pigeon Pose','45 sek je Seite'],
+      ['Standing Hamstring Stretch','30 sek je Seite'],
+      ['Dead Bug (langsam)','8 je Seite'],
+      ["Child's Pose","60 sek"],
+    ],
+    [ // Phase 1
+      ['Low Lunge + Hüftrotation','45 sek je Seite'],
+      ['Liegender Quad-Stretch','30 sek je Seite'],
+      ['Seated Forward Fold','45 sek'],
+      ['Shoulder Cross Stretch','30 sek je Seite'],
+      ["Child's Pose + Arme seitlich","60 sek"],
+    ],
+    [ // Phase 2
+      ['Pigeon Pose (intensiv)','60 sek je Seite'],
+      ['Hip Flexor Stretch','60 sek je Seite'],
+      ['Hamstring Stretch (liegend)','45 sek je Seite'],
+      ['Dead Bug (langsam)','10 je Seite'],
+      ['Supine Twist','45 sek je Seite'],
+    ],
+  ],
+  1: [ // Mittwoch
+    [ // Phase 0
+      ['Supine Twist','45 sek je Seite'],
+      ['Pigeon Pose','45 sek je Seite'],
+      ['Adduktoren-Dehnung (Grätsche)','45 sek'],
+      ['Dead Bug (langsam)','8 je Seite'],
+      ['Stomach Vacuum (liegend)','3× 30 sek'],
+    ],
+    [ // Phase 1
+      ['Liegender Hüftbeuger-Stretch','45 sek je Seite'],
+      ['Seated Butterfly Stretch','45 sek'],
+      ['Seitliche Rumpfdehnung (stehend)','30 sek je Seite'],
+      ['Dead Bug','10 je Seite'],
+      ['Stomach Vacuum','3× 30 sek'],
+    ],
+    [ // Phase 2
+      ['Pigeon Pose (intensiv)','60 sek je Seite'],
+      ['Adduktoren-Dehnung (Grätsche)','60 sek'],
+      ['Liegender Quad-Stretch','30 sek je Seite'],
+      ['Thoracic Rotation','8 je Seite'],
+      ['Stomach Vacuum','3× 30 sek'],
+    ],
+  ],
+  2: [ // Samstag
+    [ // Phase 0
+      ['Pigeon Pose','60 sek je Seite'],
+      ['Hip Flexor Stretch (deep lunge)','60 sek je Seite'],
+      ['Standing Hamstring Stretch','45 sek je Seite'],
+      ['Thoracic Spine Rotation','30 sek je Seite'],
+      ["Child's Pose + tiefe Atmung","90 sek"],
+    ],
+    [ // Phase 1
+      ['Pigeon Pose','60 sek je Seite'],
+      ['Supine Twist','45 sek je Seite'],
+      ['Liegender Hüftbeuger-Stretch','45 sek je Seite'],
+      ['Seated Forward Fold','45 sek'],
+      ["Child's Pose","90 sek"],
+    ],
+    [ // Phase 2
+      ['Pigeon Pose (intensiv)','90 sek je Seite'],
+      ['Hip Flexor Stretch (tief)','60 sek je Seite'],
+      ['Hamstring Stretch (liegend)','45 sek je Seite'],
+      ['Thoracic Spine Rotation','30 sek je Seite'],
+      ['Supine Twist','45 sek je Seite'],
+    ],
+  ],
+};
+
+function buildWCItems(items) {
+  return items.map(([name,tag])=>`<div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="wc-name">${name}</div><span class="wc-tag">${tag}</span></div>`).join('');
+}
+
+function updateWarmCool(phaseIdx) {
+  [0,1,2].forEach(d => {
+    const wb = document.getElementById(`warmup-body-${d}`);
+    const cb = document.getElementById(`cooldown-body-${d}`);
+    if(wb) wb.innerHTML = buildWCItems(warmups[d][phaseIdx]);
+    if(cb) cb.innerHTML = buildWCItems(cooldowns[d][phaseIdx]);
+  });
+}
+
 function setPhase(dayIdx, phaseIdx) {
   currentPhase = phaseIdx;
-  // sync all days
   [0,1,2].forEach(d => {
     document.querySelectorAll(`#phase-weeks-${d} .phase-btn`).forEach((b,i)=>b.classList.toggle('active',i===phaseIdx));
     document.getElementById(`phase-desc-${d}`).innerHTML = phases[phaseIdx].rpe + ' · ' + phases[phaseIdx].desc;
   });
+  updateWarmCool(phaseIdx);
 }
 
 // ── Warm/Cool helpers ──
-function buildWarmup(items) {
+function buildWarmup(items, dayIdx) {
   return `<div class="warmup-block" style="margin:0 16px 14px">
     <div class="block-header" onclick="toggleBlock(this)">
       <span class="block-title">Warm-up</span><span class="block-sub">5–8 min</span><span class="block-arrow">▾</span>
     </div>
-    <div class="block-body">
-      ${items.map(([name,tag])=>`<div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="wc-name">${name}</div><span class="wc-tag">${tag}</span></div>`).join('')}
+    <div class="block-body" id="warmup-body-${dayIdx}">
+      ${buildWCItems(items)}
     </div>
   </div>`;
 }
 
-function buildCooldown(items) {
+function buildCooldown(items, dayIdx) {
   return `<div class="cooldown-block" style="margin:0 16px 14px">
     <div class="block-header" onclick="toggleBlock(this)">
       <span class="block-title">Cool-down</span><span class="block-sub">5–7 min</span><span class="block-arrow">▾</span>
     </div>
-    <div class="block-body">
-      ${items.map(([name,tag])=>`<div class="wc-card"><div class="wc-check" onclick="toggleWC(this)"><svg class="wc-check-icon" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="wc-name">${name}</div><span class="wc-tag">${tag}</span></div>`).join('')}
+    <div class="block-body" id="cooldown-body-${dayIdx}">
+      ${buildWCItems(items)}
     </div>
   </div>`;
 }
@@ -408,49 +563,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Replace placeholder text nodes
   const ph = {
     'ROUNDS': buildRounds(),
-    'WARMUP_MO': buildWarmup([
-      ['Rudergerät oder Bike','5 min locker'],
-      ['Hip Circles + Leg Swings','10 je Seite'],
-      ['Glute Bridge (bodyweight)','15 Wdh'],
-      ['Bodyweight Squat','12 Wdh'],
-      ['Dead Bug (bodyweight)','8 je Seite'],
-    ]),
-    'COOLDOWN_MO': buildCooldown([
-      ['Hip Flexor Stretch (deep lunge)','45 sek je Seite'],
-      ['Pigeon Pose','45 sek je Seite'],
-      ['Standing Hamstring Stretch','30 sek je Seite'],
-      ['Shoulder Cross Stretch','30 sek je Seite'],
-      ['Dead Bug (langsam, kontrolliert)','8 je Seite'],
-      ["Child's Pose","60 sek"],
-    ]),
-    'WARMUP_MI': buildWarmup([
-      ['Stepmill oder Bike','5 min locker'],
-      ['Cat-Cow','10 Wdh'],
-      ['Dead Bug (bodyweight)','8 je Seite'],
-      ['KB Glute Bridge (light)','12 Wdh'],
-    ]),
-    'COOLDOWN_MI': buildCooldown([
-      ['Supine Twist','45 sek je Seite'],
-      ['Pigeon Pose','45 sek je Seite'],
-      ['Adduktoren-Dehnung (Grätsche)','45 sek'],
-      ['DB Tricep Stretch','30 sek je Seite'],
-      ['Dead Bug (langsam)','8 je Seite'],
-      ['Stomach Vacuum (liegend)','3× 30 sek'],
-    ]),
-    'WARMUP_SA': buildWarmup([
-      ['Rudergerät','5 min, Puls auf 120'],
-      ['Glute Bridge (bodyweight)','20 Wdh'],
-      ['BB Hip Thrust (light, warm-up)','10 Wdh'],
-      ['Hip Circles + Leg Swings','10 je Seite'],
-      ['Shoulder Circles','10 vor + 10 zurück'],
-    ]),
-    'COOLDOWN_SA': buildCooldown([
-      ['Pigeon Pose (intensiv)','60 sek je Seite'],
-      ['Hip Flexor Stretch (deep lunge)','60 sek je Seite'],
-      ['Standing Hamstring Stretch','45 sek je Seite'],
-      ['Thoracic Spine Rotation','30 sek je Seite'],
-      ["Child's Pose + tiefe Atmung","90 sek"],
-    ]),
+    'WARMUP_MO': buildWarmup(warmups[0][0], 0),
+    'COOLDOWN_MO': buildCooldown(cooldowns[0][0], 0),
+    'WARMUP_MI': buildWarmup(warmups[1][0], 1),
+    'COOLDOWN_MI': buildCooldown(cooldowns[1][0], 1),
+    'WARMUP_SA': buildWarmup(warmups[2][0], 2),
+    'COOLDOWN_SA': buildCooldown(cooldowns[2][0], 2),
   };
 
   // Exercise placeholders

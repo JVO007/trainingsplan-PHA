@@ -132,6 +132,33 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .timer-presets{display:flex;gap:4px}
 .preset-btn{flex:1;padding:5px 2px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--mono);font-size:11px;cursor:pointer;text-align:center;white-space:nowrap}
 .preset-btn:active{background:var(--border)}
+
+/* STATS */
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.stat-card-title{font-size:12px;font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.stat-card-title span{font-size:10px;font-family:var(--mono);color:var(--muted);font-weight:400}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.stat-row:last-child{border-bottom:none}
+.stat-val{font-family:var(--mono);color:var(--accent);font-size:12px}
+.stat-best{font-family:var(--mono);color:#f59e0b;font-size:10px}
+/* LAST WEIGHT */
+.last-weight{font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:3px}
+.last-weight span{color:#818cf8}
+/* ROUND TIMER SAVED */
+.round-time{font-size:10px;font-family:var(--mono);color:#4ade80;margin-left:6px}
+
+
+/* WORKOUT TIMER */
+.workout-timer-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:14px}
+.wt-display{font-family:var(--mono);font-size:32px;font-weight:500;color:#4ade80;min-width:90px;flex-shrink:0;letter-spacing:.02em}
+.wt-label{font-size:9px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.wt-controls{display:flex;gap:6px}
+.wt-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--mono);font-size:12px;cursor:pointer;white-space:nowrap;transition:all .2s}
+.wt-btn.start{background:#4ade80;border-color:#4ade80;color:#000}
+.wt-btn.stop{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.3);color:#f87171}
+.wt-saved{font-size:10px;font-family:var(--mono);color:var(--muted);margin-left:auto;text-align:right;line-height:1.5}
+.wt-saved span{color:#4ade80;display:block;font-size:12px}
+
 </style>
 </head>
 <body>
@@ -140,6 +167,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
   <button class="day-btn active" onclick="switchDay(0)">Mo<span>Booty</span></button>
   <button class="day-btn" onclick="switchDay(1)">Mi<span>Core</span></button>
   <button class="day-btn" onclick="switchDay(2)">Sa<span>Heavy</span></button>
+  <button class="day-btn" onclick="switchDay(3)" style="border-color:rgba(255,31,169,.3)">🏆<span>Stats</span></button>
+</div>
+
+
+<div class="workout-timer-bar" id="workout-timer-bar">
+  <div>
+    <div class="wt-label">Workout-Timer</div>
+    <div class="wt-display" id="wt-display">00:00</div>
+  </div>
+  <div>
+    <div class="wt-controls">
+      <button class="wt-btn start" id="wt-start-btn" onclick="wtToggle()">▶ Start</button>
+      <button class="wt-btn stop" onclick="wtStop()">■ Stop</button>
+    </div>
+  </div>
+  <div class="wt-saved" id="wt-saved"></div>
 </div>
 
 <!-- ═══════════════════════════════════════════
@@ -536,13 +579,15 @@ function buildEx(name, type, key, defaultW, placeholder, tags, prog) {
       <svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 9l2-2 5-5-1-1-5 5-2 2h1z" fill="currentColor"/></svg>
       <span class="w-val" id="${key}">${defaultW}</span>
     </span>` : '';
+  const lastW = key ? localStorage.getItem('last_w_'+key) : null;
+  const lastWHtml = lastW ? `<div class="last-weight">Letztes Gewicht: <span>${lastW}</span></div>` : '';
   const tagsHtml = tags.map(t => {
     const cls = ['BB','KB','DB','BW'].includes(t) ? t.toLowerCase() : '';
     return `<span class="ex-tag ${cls}">${t}</span>`;
   }).join('');
   const wrapHtml = key ? `<div class="weight-input-wrap" id="wrap-${key}"><input class="weight-input" type="text" placeholder="${placeholder}" onkeydown="if(event.key==='Enter')saveWeight('${key}',this)"><button class="weight-save" onclick="saveWeight('${key}',this.previousElementSibling)">OK</button></div>` : '';
   const progHtml = hasProg ? `<div class="ex-prog">${prog}</div>` : '';
-  return `<div class="ex-card ${typeClass}"><div class="ex-check" onclick="toggleEx(this.parentElement)">${checkSVG()}</div><div class="ex-info"><div class="ex-name">${name}</div><div class="ex-meta">${weightHtml}${tagsHtml}</div>${wrapHtml}${progHtml}</div></div>`;
+  return `<div class="ex-card ${typeClass}" data-key="${key||''}"><div class="ex-check" onclick="toggleEx(this.parentElement)">${checkSVG()}</div><div class="ex-info"><div class="ex-name">${name}</div><div class="ex-meta">${weightHtml}${tagsHtml}</div>${lastWHtml}${wrapHtml}${progHtml}</div></div>`;
 }
 
 function buildRounds() {
@@ -632,15 +677,149 @@ function switchDay(d) {
   document.querySelectorAll('.day-btn').forEach((b,i) => b.classList.toggle('active', i===d));
   currentDay = d;
   document.querySelectorAll('.weight-input-wrap.open').forEach(w => w.classList.remove('open'));
+  if(d === 3) renderStats();
+}
+
+function renderStats() {
+  // Streak
+  const sessions = JSON.parse(localStorage.getItem('sessions')||'[]');
+  document.getElementById('total-sessions').textContent = sessions.length;
+  // Simple streak: count consecutive weeks with at least 1 session
+  let streak = 0;
+  if(sessions.length > 0) {
+    const weeks = new Set(sessions.map(s => {
+      const d = new Date(s.ts); 
+      const jan = new Date(d.getFullYear(),0,1);
+      return d.getFullYear() + '-' + Math.ceil(((d-jan)/86400000+jan.getDay()+1)/7);
+    }));
+    streak = weeks.size;
+  }
+  document.getElementById('streak-count').textContent = streak;
+
+  // Best rounds
+  const roundKeys = Object.keys(localStorage).filter(k => k.includes('round_') && k.endsWith('_best'));
+  const roundEl = document.getElementById('best-rounds');
+  if(roundKeys.length === 0) {
+    roundEl.innerHTML = '<div class="stat-card" style="color:var(--muted);font-family:var(--mono);font-size:12px">Noch keine Rundenzeiten gespeichert.</div>';
+  } else {
+    const dayNames = ['Montag','Mittwoch','Samstag'];
+    const grouped = {};
+    roundKeys.forEach(k => {
+      const parts = k.split('_');
+      const dayIdx = parseInt(parts[1]);
+      const dayN = dayNames[dayIdx] || 'Tag '+dayIdx;
+      if(!grouped[dayN]) grouped[dayN] = [];
+      const secs = parseInt(localStorage.getItem(k)||'0');
+      const date = localStorage.getItem(k.replace('_best','_best_date'))||'';
+      grouped[dayN].push({key: k, secs, date, label: parts.slice(2,-1).join(' ')});
+    });
+    roundEl.innerHTML = Object.entries(grouped).map(([day, rows]) => `
+      <div class="stat-card">
+        <div class="stat-card-title">${day}</div>
+        ${rows.sort((a,b)=>a.secs-b.secs).map(r => `
+          <div class="stat-row">
+            <span>${r.label}</span>
+            <span><span class="stat-best">⚡ Best </span><span class="stat-val">${formatTime(r.secs)}</span><br><span style="font-size:9px;color:var(--muted);font-family:var(--mono)">${r.date}</span></span>
+          </div>`).join('')}
+      </div>`).join('');
+  }
+
+  // Best weights
+  const weightKeys = Object.keys(localStorage).filter(k => k.startsWith('best_load_'));
+  const weightEl = document.getElementById('best-weights');
+  if(weightKeys.length === 0) {
+    weightEl.innerHTML = '<div class="stat-card" style="color:var(--muted);font-family:var(--mono);font-size:12px">Noch keine Gewichte gespeichert.</div>';
+  } else {
+    const rows = weightKeys.map(k => {
+      const exKey = k.replace('best_load_','');
+      const load = parseFloat(localStorage.getItem(k)||'0');
+      const weight = localStorage.getItem('best_weight_'+exKey)||'';
+      const date = localStorage.getItem('best_load_date_'+exKey)||'';
+      // Try to get exercise name from DOM
+      const el = document.getElementById(exKey);
+      const name = el ? (el.closest('.ex-card')||{querySelector:()=>null}).querySelector('.ex-name')?.textContent || exKey : exKey;
+      return {name, load, weight, date};
+    }).sort((a,b) => b.load-a.load);
+    weightEl.innerHTML = `<div class="stat-card">${rows.slice(0,10).map(r => `
+      <div class="stat-row">
+        <span>${r.name}</span>
+        <span><span class="stat-val">${r.weight}</span><br><span style="font-size:9px;color:var(--muted);font-family:var(--mono)">${r.date}</span></span>
+      </div>`).join('')}</div>`;
+  }
+
+  // Recent sessions
+  const recentEl = document.getElementById('recent-sessions');
+  if(sessions.length === 0) {
+    recentEl.innerHTML = '<div class="stat-card" style="color:var(--muted);font-family:var(--mono);font-size:12px">Noch keine Trainings abgeschlossen.</div>';
+  } else {
+    recentEl.innerHTML = `<div class="stat-card">${sessions.slice(0,5).map(s => `
+      <div class="stat-row"><span>${s.day}</span><span class="stat-val" style="color:var(--muted)">${s.date}</span></div>`).join('')}</div>`;
+  }
+}
+
+function clearStats() {
+  const keep = [];
+  Object.keys(localStorage).forEach(k => {
+    if(!k.startsWith('round_') && !k.startsWith('best_') && k !== 'sessions') keep.push([k, localStorage.getItem(k)]);
+  });
+  localStorage.clear();
+  keep.forEach(([k,v]) => localStorage.setItem(k,v));
+  renderStats();
 }
 
 function toggleEx(card) { card.classList.toggle('done'); updateProgress(); }
 
 function toggleRound(dot) {
+  const wasDone = dot.classList.contains('done');
   dot.classList.toggle('done');
-  if(!dot.classList.contains('done')) {
+  if(dot.classList.contains('done')) {
+    // Save round time if timer was running or has a value
+    const elapsed = timerMax - timerSeconds;
+    if(elapsed > 5) {
+      const roundNum = dot.textContent.trim();
+      const circuit = dot.closest('.circuit');
+      const circuitLabel = circuit ? (circuit.querySelector('.circuit-label')||{}).textContent||'' : '';
+      const dayNames = ['Montag','Mittwoch','Samstag'];
+      const dayName = dayNames[currentDay] || 'Tag';
+      const timeKey = 'round_' + currentDay + '_' + circuitLabel.substring(0,10).replace(/\s/g,'') + '_r' + roundNum;
+      const prev = parseFloat(localStorage.getItem(timeKey+'_best')||'99999');
+      if(elapsed < prev) {
+        localStorage.setItem(timeKey+'_best', elapsed.toString());
+        localStorage.setItem(timeKey+'_best_date', new Date().toLocaleDateString('de-DE'));
+        // Flash best time indicator
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'round-time';
+        timeSpan.textContent = '⚡ ' + formatTime(elapsed);
+        dot.parentElement.parentElement.querySelector('.round-label').appendChild(timeSpan);
+        setTimeout(() => timeSpan.remove(), 3000);
+      }
+      localStorage.setItem(timeKey+'_last', elapsed.toString());
+      // Track session
+      trackSession();
+    }
+  } else {
     const circuit = dot.closest('.circuit');
     if(circuit) { circuit.querySelectorAll('.ex-card').forEach(c => c.classList.remove('done')); updateProgress(); }
+    // Remove any time spans
+    dot.parentElement.parentElement.querySelectorAll('.round-time').forEach(s=>s.remove());
+  }
+}
+
+function formatTime(secs) {
+  const m = Math.floor(secs/60), s = secs%60;
+  return m > 0 ? m+'m '+s+'s' : s+'s';
+}
+
+function trackSession() {
+  const key = 'sessions';
+  const sessions = JSON.parse(localStorage.getItem(key)||'[]');
+  const today = new Date().toLocaleDateString('de-DE');
+  const dayNames = ['Montag','Mittwoch','Samstag'];
+  const dayName = dayNames[currentDay];
+  if(!sessions.find(s => s.date === today && s.day === dayName)) {
+    sessions.unshift({date: today, day: dayName, ts: Date.now()});
+    if(sessions.length > 50) sessions.pop();
+    localStorage.setItem(key, JSON.stringify(sessions));
   }
 }
 
@@ -686,12 +865,55 @@ function openWeight(tag, key) {
 function saveWeight(key, inp) {
   const val = inp.value.trim();
   if(!val) { const w = document.getElementById('wrap-' + key); if(w) w.classList.remove('open'); return; }
+  // Save previous as "last weight"
+  const prev = localStorage.getItem('w_' + key);
+  if(prev && prev !== val) {
+    localStorage.setItem('last_w_' + key, prev);
+    // Update last weight display
+    const card = inp.closest('.ex-card');
+    if(card) {
+      let lw = card.querySelector('.last-weight');
+      if(lw) lw.innerHTML = 'Letztes Gewicht: <span>' + prev + '</span>';
+      else {
+        lw = document.createElement('div');
+        lw.className = 'last-weight';
+        lw.innerHTML = 'Letztes Gewicht: <span>' + prev + '</span>';
+        card.querySelector('.ex-meta').after(lw);
+      }
+    }
+    // Store for stats: best weight per key
+    const reps = getRepsForKey(key);
+    const numW = parseFloat(val.replace(/[^0-9.,]/g,'').replace(',','.')) || 0;
+    if(numW > 0 && reps > 0) {
+      const load = numW * reps;
+      const bestKey = 'best_load_' + key;
+      const bestDate = 'best_load_date_' + key;
+      const curBest = parseFloat(localStorage.getItem(bestKey)||'0');
+      if(load > curBest) {
+        localStorage.setItem(bestKey, load.toString());
+        localStorage.setItem(bestDate, new Date().toLocaleDateString('de-DE'));
+        localStorage.setItem('best_weight_' + key, val);
+      }
+    }
+  }
   localStorage.setItem('w_' + key, val);
   const el = document.getElementById(key);
   if(el) el.textContent = val;
   inp.value = '';
   const w = document.getElementById('wrap-' + key);
   if(w) w.classList.remove('open');
+}
+
+function getRepsForKey(key) {
+  // Try to find reps from the exercise card tag
+  const card = document.querySelector('[data-key="'+key+'"]');
+  if(!card) return 10;
+  const tags = card.querySelectorAll('.ex-tag');
+  for(const t of tags) {
+    const m = t.textContent.match(/(\d+)/);
+    if(m) return parseInt(m[1]);
+  }
+  return 10;
 }
 
 // ── Timer ──
@@ -741,5 +963,40 @@ function renderTimer() {
   if(el) el.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 </script>
+
+<!-- ═══════════════════════════════════════════
+     STATS
+═══════════════════════════════════════════ -->
+<div class="day-view" id="day-3">
+  <div class="day-header">
+    <div class="day-title">Stats & Bestenliste</div>
+    <div class="day-goal">Rundenzeiten · Gewichte · Streak</div>
+  </div>
+
+  <div style="margin:0 16px 16px;display:flex;gap:8px">
+    <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:10px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Streak</div>
+      <div style="font-size:32px;font-weight:800;color:var(--accent)" id="streak-count">0</div>
+      <div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px">Wochen am Stück</div>
+    </div>
+    <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:10px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Trainings</div>
+      <div style="font-size:32px;font-weight:800;color:var(--accent)" id="total-sessions">0</div>
+      <div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:2px">Gesamt</div>
+    </div>
+  </div>
+
+  <div style="margin:0 16px 10px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)">Schnellste Runden</div>
+  <div id="best-rounds" style="margin:0 16px 20px"></div>
+
+  <div style="margin:0 16px 10px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)">Schwerste Last (Gewicht × Wdh)</div>
+  <div id="best-weights" style="margin:0 16px 20px"></div>
+
+  <div style="margin:0 16px 10px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)">Letzte 5 Trainings</div>
+  <div id="recent-sessions" style="margin:0 16px 20px"></div>
+
+  <button class="reset-btn" onclick="if(confirm('Alle Stats löschen?'))clearStats()" style="border-color:rgba(255,0,0,.2);color:#f87171">✕ Alle Stats löschen</button>
+</div>
+
 </body>
 </html>
